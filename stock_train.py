@@ -6,7 +6,7 @@ import numpy as np
 import keras
 
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 
 from keras.layers.advanced_activations import LeakyReLU
 from keras.callbacks import ReduceLROnPlateau, EarlyStopping
@@ -57,15 +57,19 @@ def generate_data():
 model = Sequential()
 model.add(Dense(8192, input_dim=9600))
 model.add(LeakyReLU())
+model.add(Dropout(0.4))
 
 model.add(Dense(4096))
 model.add(LeakyReLU())
+model.add(Dropout(0.3))
 
 model.add(Dense(2048))
 model.add(LeakyReLU())
+model.add(Dropout(0.2))
 
 model.add(Dense(1024))
 model.add(LeakyReLU())
+model.add(Dropout(0.1))
 
 model.add(Dense(512))
 model.add(LeakyReLU())
@@ -94,5 +98,5 @@ model.compile(loss='mean_squared_error', optimizer=keras.optimizers.SGD(lr=1e-5,
 
 callbacks_list = [ReduceLROnPlateau(), EarlyStopping(patience=30)]
 model.fit_generator(generate_data(), steps_per_epoch=100, validation_data=generate_data(), validation_steps=30,
-                    epochs=100)
+                    epochs=100, use_multiprocessing=True)
 model.save('./my_transfer.h5')
