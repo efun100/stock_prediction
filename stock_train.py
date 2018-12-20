@@ -15,7 +15,7 @@ dir_path = "newexport1/"
 dirs = os.listdir(dir_path)
 file_count = len(dirs)
 
-BATCH_SIZE = 5
+BATCH_SIZE = 50
 
 
 def generate_data():
@@ -55,13 +55,9 @@ def generate_data():
 
 
 model = Sequential()
-model.add(Dense(8192, input_dim=9600))
+model.add(Dense(4096, input_dim=9600))
 model.add(LeakyReLU())
 model.add(Dropout(0.4))
-
-model.add(Dense(4096))
-model.add(LeakyReLU())
-model.add(Dropout(0.3))
 
 model.add(Dense(2048))
 model.add(LeakyReLU())
@@ -75,9 +71,6 @@ model.add(Dense(512))
 model.add(LeakyReLU())
 
 model.add(Dense(256))
-model.add(LeakyReLU())
-
-model.add(Dense(128))
 model.add(LeakyReLU())
 
 model.add(Dense(64))
@@ -94,9 +87,9 @@ model.add(LeakyReLU())
 
 model.add(Dense(1))
 
-model.compile(loss='mean_squared_error', optimizer=keras.optimizers.SGD(lr=1e-5, momentum=0.9))
+model.compile(loss='mean_squared_error', optimizer=keras.optimizers.SGD(lr=1e-6, momentum=0.9))
 
-callbacks_list = [ReduceLROnPlateau(), EarlyStopping(patience=30)]
-model.fit_generator(generate_data(), steps_per_epoch=100, validation_data=generate_data(), validation_steps=30,
-                    epochs=100, use_multiprocessing=True)
+callbacks_list = [ReduceLROnPlateau(), EarlyStopping(patience=100)]
+model.fit_generator(generate_data(), steps_per_epoch=100, callbacks=callbacks_list, validation_data=generate_data(),
+                    validation_steps=30, epochs=10000, use_multiprocessing=True, )
 model.save('./my_transfer.h5')
